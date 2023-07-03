@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Editor de Imágen</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<style>
+		.container {
+			width: 500px;
+			height: 500px;
+			border: 2px dashed #f7a239;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: #fff;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.container img {
+			max-width: 100%;
+			max-height: 100%;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			object-fit: contain;
+			object-position: center;
+		}
+
+        #app{
+            /* background-color: #f7a239; */
+            padding: 0px;
+        }
+
+        .form-container{
+            background-color: #fff;
+            color: #267e7b;
+            padding: 12px;
+            width: 80%;
+            margin: 0 auto;            
+            border-radius: 8px 8px;
+            z-index: 10;            
+            /* box-shadow: desvia-hacia-abajo devia-hacia-derecha blur color-de-la-combra */
+            box-shadow: 2px 2px 2px 3px #aaa;
+        }
+
+        #title{
+            text-align: center;         
+        }
+
+        .custom-margin{
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        .custom-nav{
+            grid-area:header-area;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-areas: 'header-container-area';           
+
+            /* styles */
+            position: relative;
+            z-index: 10;            
+            /* box-shadow: desvia-hacia-abajo devia-hacia-derecha blur color-de-la-combra */
+            box-shadow: 3px 0 5px #aaa;
+            /* background-color: #555; */            
+        }   
+
+        h1{
+            color: #267e7b;
+            font-weight: 700;
+            font-size: large;
+            padding-left: 42px;
+        }
+
+        .custom-margin-a{
+            margin-top: 32px;
+        }  
+	</style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <nav class="custom-nav navbar navbar-expand-lg">
+                <h1 class="navbar-brand" href="#">Editor de Imágen</h1>    
+            </nav>
+        </header>
+        
+        <div class="container-fluid custom-margin-a">
+            <div class="row no-gutters">              
+              <div class="col">
+                <div class="form-container"> 
+                    <div id="title" class="custom-margin" >
+                        <h3>Editor de Imágen</h3>
+                    </div>
+                    <form class="was-validated">        
+                        <div class="form-group custom-margin"">
+                            <label for="categoria" >Seleccione una categoria:</label>
+                            <select class="form-control" id="categoria">
+                              <option value="1">diapositivas</option>
+                              <option value="2">personal</option>
+                              <option value="3">infraestructura</option>
+                              <option value="4">galleria</option>
+                              <option value="5">reconocimiento</option>
+                            </select>
+                        </div>
+
+                        <div class="custom-file custom-margin">
+                            <label class="custom-file-label" for="file">Seleccione una imagen...</label>
+                            <input type="file" class="custom-file-input" id="file" required>            
+                        </div>
+                
+                    
+                        <div class="form-outline custom-margin">
+                            <label class="form-label" for="width">Color de fondo:</label>
+                            <input type="color" id="color-fondo" name="color"><br>
+                        </div>
+                
+                        <input type="button" class="custom-margin btn btn-info" value="Aplicar Estilos" onclick="applyChanges()">                        
+                        
+                        <div id="save-items" class="custom-margin" hidden>                           
+                            <label for="filename" class="custom-margin" >Nombre de la Imágen a descargar:</label><br>
+                            <input class="custom-margin form-control"  type="text" id="filename" name="filename" value="imagenA"><br>
+                            <input class="custom-margin btn btn-info"  type="button" value="Save" onclick="saveImage()">
+                        </div>            
+                    </form>
+                </div>
+        
+              </div>
+              <div class="col">                
+                <div class="container custom-margin">
+                    <img id="image" src="">
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+   
+
+
+	<script>
+		var canvas = document.createElement("canvas");
+		var context = canvas.getContext("2d");           
+      
+        var containerWidth = 0 //document.getElementById("containerWidth").value;
+		var containerHeight = 0 //document.getElementById("containerHeight").value;       
+
+        //color picker        
+        let color = document.getElementById("color-fondo").value;
+        window.addEventListener("load", startup, false);
+
+
+		function applyChanges() {
+            
+            var categoria = document.getElementById("categoria").value     
+            // console.log(categoria)
+            
+            switch(categoria) {
+                case '1':
+                    containerWidth = 1024 //document.getElementById("containerWidth").value;
+                    containerHeight = 600 //document.getElementById("containerHeight").value;
+                    break;
+                case '2':
+                    containerWidth = 500 //document.getElementById("containerWidth").value;
+                    containerHeight = 700 //document.getElementById("containerHeight").value;
+                    break;
+                case '3':
+                    containerWidth = 800 //document.getElementById("containerWidth").value;
+                    containerHeight = 600 //document.getElementById("containerHeight").value;
+                    break;
+                case '4':
+                    containerWidth = 600 //document.getElementById("containerWidth").value;
+                    containerHeight = 400 //document.getElementById("containerHeight").value;
+                    break;
+                case '5':
+                    containerWidth = 1000 //document.getElementById("containerWidth").value;
+                    containerHeight = 500 //document.getElementById("containerHeight").value;
+                    break;
+                default:
+                    containerWidth = 800 //document.getElementById("containerWidth").value;
+                    containerHeight = 600 //document.getElementById("containerHeight").value;
+            }
+
+			// Get the file input, border width, and background color from the form
+			var fileInput = document.getElementById("file");	
+
+			// Check if a file has been selected
+			if (fileInput.files.length == 0) {
+				alert("Please select an image file.");
+				return;
+			}
+
+			// Load the selected image
+			var file = fileInput.files[0];
+			var reader = new FileReader();
+			reader.onload = function(event) {
+				var image = new Image();
+				image.onload = function() {                  
+                    // Calculate the new image dimensions to fit inside the container
+					var containerAspectRatio = containerWidth / containerHeight;
+					var imageAspectRatio = image.width / image.height;
+					var newWidth, newHeight;
+					if (imageAspectRatio > containerAspectRatio) {
+						newWidth = containerWidth;
+						newHeight = containerWidth / imageAspectRatio;
+					} else {
+						newWidth = containerHeight * imageAspectRatio;
+						newHeight = containerHeight;
+					}
+
+					// Create a canvas to draw the modified image
+					canvas.width = containerWidth;
+					canvas.height = containerHeight;
+
+					// Draw the modified image onto the canvas		
+                    context.fillStyle = color
+					context.fillRect(0, 0, canvas.width, canvas.height);
+					context.drawImage(image, (canvas.width - newWidth) / 2, (canvas.height - newHeight) / 2, newWidth, newHeight);
+
+					// Set the modified image as the source of the <img> element
+					document.getElementById("image").src = canvas.toDataURL();
+
+                    console.log(color)
+
+				};
+				image.src = event.target.result;
+			};
+			reader.readAsDataURL(file);
+
+            //show the option to save image
+            document.getElementById("save-items").hidden = false              
+            
+		}
+
+		function saveImage() {
+			// Get the filename from the form
+			var filename = document.getElementById("filename").value;
+
+			// Create a new canvas with the specified container area size
+			var containerWidth = 1024 //document.getElementById("containerWidth").value;
+			var containerHeight = 600 //document.getElementById("containerHeight").value;
+			var newCanvas = document.createElement("canvas");
+			newCanvas.width = containerWidth;
+			newCanvas.height = containerHeight;
+			var newContext = newCanvas.getContext("2d");
+
+			// Draw the container onto the new canvas
+			// newContext.fillStyle = "#fff";
+			newContext.fillRect(0, 0, containerWidth, containerHeight);
+			newContext.drawImage(canvas, 0, 0, containerWidth, containerHeight);
+
+			// Download the modified image as a PNG file
+			var link = document.createElement("a");
+			link.download = filename + ".jpg";
+			link.href = newCanvas.toDataURL();
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+
+            //hide the option to save image
+            document.getElementById("save-items").hidden = false            
+		}
+    
+        
+        function startup() {                  
+            colorPicker = document.getElementById("color-fondo");    
+            colorPicker.addEventListener("change", updateColorValue, false);            
+            colorPicker.select();
+        }
+
+        function updateColorValue(event) {
+            colorPicker = document.getElementById("color-fondo")
+            colorPicker.value  = event.target.value;
+            color = document.getElementById("color-fondo").value          
+        }
+
+	</script>    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
